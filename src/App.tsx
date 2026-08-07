@@ -12,13 +12,11 @@ import {
   type AdminRole,
 } from './lib/supabase';
 import { OverviewPage } from './pages/OverviewPage';
+import { StudentsPage } from './pages/StudentsPage';
 import { TeacherApplicationsPage } from './pages/TeacherApplicationsPage';
 import { CourseReviewPage } from './pages/CourseReviewPage';
 import { CoursesCatalogPage } from './pages/CoursesCatalogPage';
 import { TeachersListPage } from './pages/TeachersListPage';
-import { UsersPage } from './pages/UsersPage';
-import { VideosPage } from './pages/VideosPage';
-import { ReportsPage } from './pages/ReportsPage';
 import { DisputesPage } from './pages/DisputesPage';
 import { PayoutsPage } from './pages/PayoutsPage';
 import { OrdersPage } from './pages/OrdersPage';
@@ -57,8 +55,8 @@ export function App() {
   if (!session) {
     return (
       <div className="card login">
-        <h1 style={{ color: 'var(--cyan)' }}>TaaTiko Admin</h1>
-        <p className="muted">admin.taatiko.com — authorised staff only.</p>
+        <h1 style={{ color: 'var(--cyan)' }}>TaaTiko Learn Admin</h1>
+        <p className="muted">E-learning only — teachers, courses, students & sales. Not social media.</p>
         {!isSupabaseConfigured ? (
           <div style={{ color: 'var(--danger)', lineHeight: 1.5, marginBottom: 12 }}>
             <p style={{ margin: '0 0 8px' }}>
@@ -111,31 +109,29 @@ export function App() {
   return (
     <div className="layout">
       <aside className="sidebar">
-        <h1>TaaTiko</h1>
-        <p>Admin · {roles.join(', ')}</p>
+        <h1>TaaTiko Learn</h1>
+        <p>E-learning admin · {roles.join(', ')}</p>
         <nav className="nav">
           <div className="nav-label">Home</div>
           <NavLink to="/" end>
             Overview
           </NavLink>
 
-          <div className="nav-label">People</div>
-          <NavLink to="/users">Users</NavLink>
+          <div className="nav-label">Students</div>
+          <NavLink to="/students">Course buyers</NavLink>
+          {canFinance(roles) ? <NavLink to="/orders">Orders</NavLink> : null}
+
+          <div className="nav-label">Teachers</div>
           <NavLink to="/teachers-list">Teachers</NavLink>
-          {canReview(roles) ? <NavLink to="/teachers">Teacher applications</NavLink> : null}
+          {canReview(roles) ? <NavLink to="/teachers">Applications</NavLink> : null}
 
-          <div className="nav-label">Learn</div>
+          <div className="nav-label">Courses</div>
           <NavLink to="/courses">All courses</NavLink>
-          {canReview(roles) ? <NavLink to="/course-review">Course review</NavLink> : null}
-
-          <div className="nav-label">Content</div>
-          <NavLink to="/videos">Videos</NavLink>
-          {canModerate(roles) ? <NavLink to="/reports">Reports</NavLink> : null}
+          {canReview(roles) ? <NavLink to="/course-review">Review queue</NavLink> : null}
 
           {canFinance(roles) ? (
             <>
               <div className="nav-label">Finance</div>
-              <NavLink to="/orders">Orders</NavLink>
               <NavLink to="/payouts">Payouts</NavLink>
               <NavLink to="/disputes">Disputes</NavLink>
             </>
@@ -143,12 +139,11 @@ export function App() {
 
           {canModerate(roles) ? (
             <>
-              <div className="nav-label">Security</div>
+              <div className="nav-label">System</div>
               <NavLink to="/audit">Audit logs</NavLink>
             </>
           ) : null}
 
-          <div className="nav-label">System</div>
           <NavLink to="/settings">Settings</NavLink>
         </nav>
         <button
@@ -162,7 +157,7 @@ export function App() {
       <main className="main">
         <Routes>
           <Route path="/" element={<OverviewPage roles={roles} />} />
-          <Route path="/users" element={<UsersPage />} />
+          <Route path="/students" element={<StudentsPage />} />
           <Route path="/teachers-list" element={<TeachersListPage />} />
           <Route
             path="/teachers"
@@ -172,11 +167,6 @@ export function App() {
           <Route
             path="/course-review"
             element={canReview(roles) ? <CourseReviewPage /> : <Navigate to="/" />}
-          />
-          <Route path="/videos" element={<VideosPage />} />
-          <Route
-            path="/reports"
-            element={canModerate(roles) ? <ReportsPage /> : <Navigate to="/" />}
           />
           <Route path="/orders" element={canFinance(roles) ? <OrdersPage /> : <Navigate to="/" />} />
           <Route
@@ -189,6 +179,9 @@ export function App() {
           />
           <Route path="/audit" element={canModerate(roles) ? <AuditPage /> : <Navigate to="/" />} />
           <Route path="/settings" element={<SettingsPage roles={roles} />} />
+          <Route path="/users" element={<Navigate to="/students" replace />} />
+          <Route path="/videos" element={<Navigate to="/" replace />} />
+          <Route path="/reports" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </div>
