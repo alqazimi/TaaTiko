@@ -132,7 +132,7 @@ export function App() {
           {canFinance(roles) ? (
             <>
               <div className="nav-label">Finance</div>
-              <NavLink to="/payouts">Payouts</NavLink>
+              <NavLink to="/payouts">Manual payouts</NavLink>
               <NavLink to="/disputes">Disputes</NavLink>
             </>
           ) : null}

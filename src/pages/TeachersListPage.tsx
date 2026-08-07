@@ -85,7 +85,7 @@ export function TeachersListPage() {
               <th>Status</th>
               <th>Students</th>
               <th>Rating</th>
-              <th>Payout</th>
+              <th>How paid</th>
               <th>Stripe</th>
               <th>Approved</th>
             </tr>
@@ -105,7 +105,13 @@ export function TeachersListPage() {
                 </td>
                 <td>{t.students_count ?? 0}</td>
                 <td>{t.average_rating ? Number(t.average_rating).toFixed(1) : '—'}</td>
-                <td className="muted">{t.payout_mode ?? '—'}</td>
+                <td>
+                  {t.payout_mode === 'stripe_connect'
+                    ? 'Self-withdraw (Stripe)'
+                    : t.payout_mode === 'manual_somali'
+                      ? 'Manual (admin)'
+                      : (t.payout_mode ?? '—')}
+                </td>
                 <td>{t.stripe_onboarding_complete ? 'Ready' : 'Incomplete'}</td>
                 <td className="muted">{when(t.approved_at)}</td>
               </tr>

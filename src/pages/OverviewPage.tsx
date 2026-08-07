@@ -195,7 +195,8 @@ export function OverviewPage({ roles }: { roles: AdminRole[] }) {
           <span className="stat-sub">{stats.pendingTeachers} applications pending</span>
         </div>
         <div className="stat">
-          <strong>{stats.pendingPayouts}</strong>Payouts queue
+          <strong>{stats.pendingPayouts}</strong>Manual payouts due
+          <span className="stat-sub">Somali / EVC only — not Stripe</span>
         </div>
       </div>
 
@@ -255,7 +256,7 @@ export function OverviewPage({ roles }: { roles: AdminRole[] }) {
             Orders
           </Link>
           <Link className="btn ghost" to="/payouts">
-            Payouts
+            Manual payouts
           </Link>
         </div>
         <p className="muted" style={{ marginTop: 12 }}>
