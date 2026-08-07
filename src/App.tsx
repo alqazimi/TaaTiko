@@ -6,6 +6,7 @@ import {
   canModerate,
   canReview,
   fetchAdminRoles,
+  isSupabaseConfigured,
   supabase,
   type AdminRole,
 } from './lib/supabase';
@@ -51,6 +52,13 @@ export function App() {
       <div className="card login">
         <h1 style={{ color: 'var(--cyan)' }}>TaaTiko Admin</h1>
         <p className="muted">admin.taatiko.com — authorised staff only. Enable MFA in production.</p>
+        {!isSupabaseConfigured ? (
+          <p style={{ color: 'var(--danger)', lineHeight: 1.5 }}>
+            Supabase is not configured on this deployment. In Vercel → Settings → Environment
+            Variables add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>, then
+            Redeploy (env vars only apply after a new build).
+          </p>
+        ) : null}
         <label className="muted">Email</label>
         <input value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" />
         <label className="muted">Password</label>
@@ -63,6 +71,7 @@ export function App() {
         {error ? <p style={{ color: 'var(--danger)' }}>{error}</p> : null}
         <button
           className="btn"
+          disabled={!isSupabaseConfigured}
           onClick={async () => {
             setError('');
             const { error: err } = await supabase.auth.signInWithPassword({ email, password });

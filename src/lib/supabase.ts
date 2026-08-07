@@ -1,9 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL as string;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const url = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+const anon = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
 
-export const supabase = createClient(url || 'https://placeholder.supabase.co', anon || 'placeholder');
+export const isSupabaseConfigured = Boolean(
+  url &&
+    anon &&
+    !url.includes('placeholder') &&
+    !url.includes('your-project') &&
+    anon !== 'placeholder' &&
+    anon !== 'your-anon-key',
+);
+
+if (!isSupabaseConfigured) {
+  console.error(
+    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Set them in Vercel → Settings → Environment Variables, then Redeploy.',
+  );
+}
+
+export const supabase = createClient(
+  isSupabaseConfigured ? url! : 'https://placeholder.supabase.co',
+  isSupabaseConfigured ? anon! : 'placeholder',
+);
 
 export type AdminRole = 'super_admin' | 'course_reviewer' | 'finance_admin' | 'moderator';
 
