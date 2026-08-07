@@ -1,27 +1,62 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const url = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
-const anon = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
+function cleanEnv(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  // Strip accidental quotes / whitespace from Vercel paste.
+  return value.trim().replace(/^['"]|['"]$/g, '');
+}
+
+const url = cleanEnv(import.meta.env.VITE_SUPABASE_URL);
+const anon = cleanEnv(import.meta.env.VITE_SUPABASE_ANON_KEY);
 
 export const isSupabaseConfigured = Boolean(
-  url &&
-    anon &&
+  url.startsWith('https://') &&
     !url.includes('placeholder') &&
     !url.includes('your-project') &&
+    anon.length > 20 &&
     anon !== 'placeholder' &&
     anon !== 'your-anon-key',
 );
 
+export const supabaseConfigStatus = {
+  hasUrl: Boolean(url),
+  hasAnonKey: anon.length > 20,
+  urlHost: url ? (() => {
+    try {
+      return new URL(url).host;
+    } catch {
+      return '(invalid url)';
+    }
+  })() : '(missing)',
+  anonKeyLength: anon.length,
+};
+
 if (!isSupabaseConfigured) {
-  console.error(
-    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Set them in Vercel → Settings → Environment Variables, then Redeploy.',
-  );
+  console.error('Supabase env missing at build time', supabaseConfigStatus);
 }
 
-export const supabase = createClient(
-  isSupabaseConfigured ? url! : 'https://placeholder.supabase.co',
-  isSupabaseConfigured ? anon! : 'placeholder',
-);
+function createConfiguredClient(): SupabaseClient {
+  if (!isSupabaseConfigured) {
+    // Do not call real project URL without an apikey — that yields:
+    // "No API key found in request"
+    return createClient('https://placeholder.supabase.co', 'placeholder');
+  }
+
+  return createClient(url, anon, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+    global: {
+      headers: {
+        apikey: anon,
+      },
+    },
+  });
+}
+
+export const supabase = createConfiguredClient();
 
 export type AdminRole = 'super_admin' | 'course_reviewer' | 'finance_admin' | 'moderator';
 

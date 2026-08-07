@@ -8,6 +8,7 @@ import {
   fetchAdminRoles,
   isSupabaseConfigured,
   supabase,
+  supabaseConfigStatus,
   type AdminRole,
 } from './lib/supabase';
 import { OverviewPage } from './pages/OverviewPage';
@@ -53,11 +54,21 @@ export function App() {
         <h1 style={{ color: 'var(--cyan)' }}>TaaTiko Admin</h1>
         <p className="muted">admin.taatiko.com — authorised staff only. Enable MFA in production.</p>
         {!isSupabaseConfigured ? (
-          <p style={{ color: 'var(--danger)', lineHeight: 1.5 }}>
-            Supabase is not configured on this deployment. In Vercel → Settings → Environment
-            Variables add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>, then
-            Redeploy (env vars only apply after a new build).
-          </p>
+          <div style={{ color: 'var(--danger)', lineHeight: 1.5, marginBottom: 12 }}>
+            <p style={{ margin: '0 0 8px' }}>
+              Supabase API key is missing from this Vercel build. That causes:{' '}
+              <code>No API key found in request</code>.
+            </p>
+            <p style={{ margin: '0 0 8px' }} className="muted">
+              Build status — URL: {supabaseConfigStatus.hasUrl ? supabaseConfigStatus.urlHost : 'missing'} ·
+              anon key: {supabaseConfigStatus.hasAnonKey ? `ok (${supabaseConfigStatus.anonKeyLength} chars)` : 'MISSING'}
+            </p>
+            <p style={{ margin: 0 }}>
+              In Vercel → Settings → Environment Variables add both{' '}
+              <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> (Production), then
+              Redeploy with build cache disabled.
+            </p>
+          </div>
         ) : null}
         <label className="muted">Email</label>
         <input value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" />
