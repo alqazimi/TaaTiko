@@ -78,7 +78,8 @@ export function TeachersListPage() {
         />
       </div>
       <div className="card">
-        <table>
+        <div className="table-scroll">
+<table>
           <thead>
             <tr>
               <th>Teacher</th>
@@ -118,6 +119,7 @@ export function TeachersListPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

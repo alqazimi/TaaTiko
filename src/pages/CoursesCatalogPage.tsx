@@ -109,7 +109,8 @@ export function CoursesCatalogPage() {
       </div>
 
       <div className="card">
-        <table>
+        <div className="table-scroll">
+<table>
           <thead>
             <tr>
               <th>Course</th>
@@ -163,6 +164,7 @@ export function CoursesCatalogPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

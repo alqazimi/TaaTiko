@@ -42,7 +42,8 @@ export function DisputesPage() {
         {rows.length === 0 ? (
           <p className="muted">No disputes recorded.</p>
         ) : (
-          <table>
+          <div className="table-scroll">
+<table>
             <thead>
               <tr>
                 <th>Status</th>
@@ -70,6 +71,7 @@ export function DisputesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

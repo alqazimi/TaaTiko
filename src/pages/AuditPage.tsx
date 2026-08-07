@@ -46,7 +46,8 @@ export function AuditPage() {
     <div>
       <h2>Audit logs</h2>
       <div className="card">
-        <table>
+        <div className="table-scroll">
+<table>
           <thead>
             <tr>
               <th>When</th>
@@ -66,6 +67,7 @@ export function AuditPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

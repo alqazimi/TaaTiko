@@ -146,7 +146,8 @@ export function StudentsPage() {
         {filtered.length === 0 && !loading ? (
           <p className="muted">No course purchases yet. When a user buys a course, they appear here as a student.</p>
         ) : (
-          <table>
+          <div className="table-scroll">
+<table>
             <thead>
               <tr>
                 <th>Student</th>
@@ -179,6 +180,7 @@ export function StudentsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

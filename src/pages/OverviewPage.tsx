@@ -208,7 +208,8 @@ export function OverviewPage({ roles }: { roles: AdminRole[] }) {
         {recentStudents.length === 0 ? (
           <p className="muted">No paid course purchases yet.</p>
         ) : (
-          <table>
+          <div className="table-scroll">
+<table>
             <thead>
               <tr>
                 <th>Student</th>
@@ -237,6 +238,7 @@ export function OverviewPage({ roles }: { roles: AdminRole[] }) {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
