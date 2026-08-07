@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import type { Session } from '@supabase/supabase-js';
+import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import {
   canFinance,
   canModerate,
@@ -14,6 +14,12 @@ import {
 import { OverviewPage } from './pages/OverviewPage';
 import { TeacherApplicationsPage } from './pages/TeacherApplicationsPage';
 import { CourseReviewPage } from './pages/CourseReviewPage';
+import { CoursesCatalogPage } from './pages/CoursesCatalogPage';
+import { TeachersListPage } from './pages/TeachersListPage';
+import { UsersPage } from './pages/UsersPage';
+import { VideosPage } from './pages/VideosPage';
+import { ReportsPage } from './pages/ReportsPage';
+import { DisputesPage } from './pages/DisputesPage';
 import { PayoutsPage } from './pages/PayoutsPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { AuditPage } from './pages/AuditPage';
@@ -52,21 +58,16 @@ export function App() {
     return (
       <div className="card login">
         <h1 style={{ color: 'var(--cyan)' }}>TaaTiko Admin</h1>
-        <p className="muted">admin.taatiko.com — authorised staff only. Enable MFA in production.</p>
+        <p className="muted">admin.taatiko.com — authorised staff only.</p>
         {!isSupabaseConfigured ? (
           <div style={{ color: 'var(--danger)', lineHeight: 1.5, marginBottom: 12 }}>
             <p style={{ margin: '0 0 8px' }}>
-              Supabase API key is missing from this Vercel build. That causes:{' '}
-              <code>No API key found in request</code>.
+              Missing <code>VITE_SUPABASE_URL</code> / <code>VITE_SUPABASE_ANON_KEY</code> on this
+              build.
             </p>
-            <p style={{ margin: '0 0 8px' }} className="muted">
-              Build status — URL: {supabaseConfigStatus.hasUrl ? supabaseConfigStatus.urlHost : 'missing'} ·
-              anon key: {supabaseConfigStatus.hasAnonKey ? `ok (${supabaseConfigStatus.anonKeyLength} chars)` : 'MISSING'}
-            </p>
-            <p style={{ margin: 0 }}>
-              In Vercel → Settings → Environment Variables add both{' '}
-              <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> (Production), then
-              Redeploy with build cache disabled.
+            <p style={{ margin: 0 }} className="muted">
+              Host: {supabaseConfigStatus.urlHost} · anon key:{' '}
+              {supabaseConfigStatus.hasAnonKey ? 'ok' : 'MISSING'}
             </p>
           </div>
         ) : null}
@@ -113,41 +114,79 @@ export function App() {
         <h1>TaaTiko</h1>
         <p>Admin · {roles.join(', ')}</p>
         <nav className="nav">
+          <div className="nav-label">Home</div>
           <NavLink to="/" end>
             Overview
           </NavLink>
-          {canReview(roles) ? (
-            <>
-              <NavLink to="/teachers">Teacher applications</NavLink>
-              <NavLink to="/courses">Course review</NavLink>
-            </>
-          ) : null}
+
+          <div className="nav-label">People</div>
+          <NavLink to="/users">Users</NavLink>
+          <NavLink to="/teachers-list">Teachers</NavLink>
+          {canReview(roles) ? <NavLink to="/teachers">Teacher applications</NavLink> : null}
+
+          <div className="nav-label">Learn</div>
+          <NavLink to="/courses">All courses</NavLink>
+          {canReview(roles) ? <NavLink to="/course-review">Course review</NavLink> : null}
+
+          <div className="nav-label">Content</div>
+          <NavLink to="/videos">Videos</NavLink>
+          {canModerate(roles) ? <NavLink to="/reports">Reports</NavLink> : null}
+
           {canFinance(roles) ? (
             <>
-              <NavLink to="/orders">Orders & refunds</NavLink>
-              <NavLink to="/payouts">Monthly payouts</NavLink>
+              <div className="nav-label">Finance</div>
+              <NavLink to="/orders">Orders</NavLink>
+              <NavLink to="/payouts">Payouts</NavLink>
+              <NavLink to="/disputes">Disputes</NavLink>
             </>
           ) : null}
-          {canModerate(roles) ? <NavLink to="/audit">Audit logs</NavLink> : null}
+
+          {canModerate(roles) ? (
+            <>
+              <div className="nav-label">Security</div>
+              <NavLink to="/audit">Audit logs</NavLink>
+            </>
+          ) : null}
+
+          <div className="nav-label">System</div>
           <NavLink to="/settings">Settings</NavLink>
         </nav>
-        <button className="btn ghost" style={{ marginTop: 24, width: '100%' }} onClick={() => void supabase.auth.signOut()}>
+        <button
+          className="btn ghost"
+          style={{ marginTop: 24, width: '100%' }}
+          onClick={() => void supabase.auth.signOut()}
+        >
           Sign out
         </button>
       </aside>
       <main className="main">
         <Routes>
           <Route path="/" element={<OverviewPage roles={roles} />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/teachers-list" element={<TeachersListPage />} />
           <Route
             path="/teachers"
             element={canReview(roles) ? <TeacherApplicationsPage /> : <Navigate to="/" />}
           />
+          <Route path="/courses" element={<CoursesCatalogPage />} />
           <Route
-            path="/courses"
+            path="/course-review"
             element={canReview(roles) ? <CourseReviewPage /> : <Navigate to="/" />}
           />
+          <Route path="/videos" element={<VideosPage />} />
+          <Route
+            path="/reports"
+            element={canModerate(roles) ? <ReportsPage /> : <Navigate to="/" />}
+          />
           <Route path="/orders" element={canFinance(roles) ? <OrdersPage /> : <Navigate to="/" />} />
-          <Route path="/payouts" element={canFinance(roles) ? <PayoutsPage /> : <Navigate to="/" />} />
+          <Route
+            path="/payouts"
+            element={canFinance(roles) ? <PayoutsPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/disputes"
+            element={canFinance(roles) ? <DisputesPage /> : <Navigate to="/" />}
+          />
           <Route path="/audit" element={canModerate(roles) ? <AuditPage /> : <Navigate to="/" />} />
           <Route path="/settings" element={<SettingsPage roles={roles} />} />
         </Routes>

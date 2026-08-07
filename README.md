@@ -20,13 +20,32 @@ on conflict do nothing;
 update profiles set is_admin = true where id = '<profile uuid>';
 ```
 
+Apply moderation RLS (reports / all videos for admins):
+
+```bash
+supabase db push
+# or run migration 20260807010000_admin_moderation_rls.sql in SQL Editor
+```
+
+## Pages
+
+| Section | Pages |
+|---------|--------|
+| Overview | Users, videos, teachers, active courses, GMV, queues |
+| People | Users, Teachers, Teacher applications |
+| Learn | All courses (by status), Course review queue |
+| Content | Videos, Reports |
+| Finance | Orders, Payouts, Disputes |
+| Security | Audit logs |
+| System | Settings |
+
 ## Roles
 
 | Role | Access |
 |------|--------|
 | `super_admin` | Full |
 | `course_reviewer` | Teachers + courses |
-| `finance_admin` | Orders + payouts |
+| `finance_admin` | Orders + payouts + disputes |
 | `moderator` | Audit / reports |
 
 ## Production
